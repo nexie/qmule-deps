@@ -1,8 +1,0 @@
-!.gitignore
-/b2
-/bin.v2
-/bjam
-/bootstrap.log
-/project-config.jam
-/stage
-/tools
