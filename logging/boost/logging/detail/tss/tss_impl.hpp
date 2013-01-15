@@ -42,7 +42,7 @@ public:
     inline void set(void* value);
 
 private:
-    unsigned int m_slot; //This is a "pseudo-slot", not a native slot
+    unsigned int m_libed2k_pod; //This is a "pseudo-libed2k_pod", not a native libed2k_pod
 };
 
 }}} 

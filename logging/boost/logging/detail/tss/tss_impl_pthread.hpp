@@ -26,35 +26,35 @@
 
 namespace boost { namespace logging { namespace detail {
 
-typedef std::vector<void*> tss_slots;
+typedef std::vector<void*> tss_libed2k_pods;
 
 inline pthread_key_t & tss_data_native_key() {
     static pthread_key_t key;
     return key;
 }
 
-inline tss_slots* get_slots()
+inline tss_libed2k_pods* get_libed2k_pods()
 {
-    tss_slots* slots = 0;
-    slots = static_cast<tss_slots*>( pthread_getspecific(tss_data_native_key()));
-    if (slots == 0)
+    tss_libed2k_pods* libed2k_pods = 0;
+    libed2k_pods = static_cast<tss_libed2k_pods*>( pthread_getspecific(tss_data_native_key()));
+    if (libed2k_pods == 0)
     {
-        std::auto_ptr<tss_slots> temp( new_object_ensure_delete<tss_slots>() );
+        std::auto_ptr<tss_libed2k_pods> temp( new_object_ensure_delete<tss_libed2k_pods>() );
         // pre-allocate a few elems, so that we'll be fast
         temp->resize(BOOST_LOG_TSS_SLOTS_SIZE);
 
         pthread_setspecific(tss_data_native_key(), temp.get());
-        slots = temp.release();
+        libed2k_pods = temp.release();
     }
 
-    return slots;
+    return libed2k_pods;
 }
 
-extern "C" inline void cleanup_slots(void* ) {}
+extern "C" inline void cleanup_libed2k_pods(void* ) {}
 
 inline void init_tss_data()
 {
-    pthread_key_create(&tss_data_native_key(), &cleanup_slots);
+    pthread_key_create(&tss_data_native_key(), &cleanup_libed2k_pods);
 
     // make sure the static gets created
     object_deleter();
@@ -62,7 +62,7 @@ inline void init_tss_data()
 
 
 
-inline unsigned int slot_idx() {
+inline unsigned int libed2k_pod_idx() {
     typedef boost::logging::threading::mutex mutex;
     static mutex cs;
     static unsigned int idx = 0;
@@ -78,7 +78,7 @@ inline unsigned int slot_idx() {
     return idx;
 }
 
-inline tss::tss() : m_slot( slot_idx() )
+inline tss::tss() : m_libed2k_pod( libed2k_pod_idx() )
 {
 }
 
@@ -88,27 +88,27 @@ inline tss::~tss()
 
 inline void* tss::get() const
 {
-    tss_slots* slots = get_slots();
+    tss_libed2k_pods* libed2k_pods = get_libed2k_pods();
 
-    if (!slots)
+    if (!libed2k_pods)
         return 0;
 
-    if (m_slot >= slots->size())
+    if (m_libed2k_pod >= libed2k_pods->size())
         return 0;
 
-    return (*slots)[m_slot];
+    return (*libed2k_pods)[m_libed2k_pod];
 }
 
 inline void tss::set(void* value)
 {
-    tss_slots* slots = get_slots();
+    tss_libed2k_pods* libed2k_pods = get_libed2k_pods();
 
-    if (m_slot >= slots->size())
+    if (m_libed2k_pod >= libed2k_pods->size())
     {
-        slots->resize(m_slot + 1);
+        libed2k_pods->resize(m_libed2k_pod + 1);
     }
 
-    (*slots)[m_slot] = value;
+    (*libed2k_pods)[m_libed2k_pod] = value;
 }
 
 }}}
